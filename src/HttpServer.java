@@ -4,7 +4,7 @@ import java.net.Socket;
 import java.io.DataOutputStream;
 
 public class HttpServer {
-    public static void main(String[] args) {git add
+    public static void main(String[] args) {
         int portNumber = 8080;
 
         try {
@@ -18,7 +18,8 @@ public class HttpServer {
                 clientSocket = serverSocket.accept();
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+                DataOutputStream g = new DataOutputStream(clientSocket.getOutputStream());
+                PrintWriter out = new PrintWriter(g, true);
 
                 String request = in.readLine();
 
