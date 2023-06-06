@@ -1,0 +1,9 @@
+<webconf>
+    <port>8080</port>
+    <root>index.html</root>
+    <accept>192.168.0.0/24</accept>
+    <accept>192.168.2.0/24</accept>
+    <reject> 192.168.1.0/24</reject>
+    <reject> 192.168.3.0/24</reject>
+    
+</webconf>
