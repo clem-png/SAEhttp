@@ -42,8 +42,8 @@ public class HttpServer {
         //System.out.println("Port : " + port);
 
         NodeList nodeList2 = root.getElementsByTagName("root");
-        String pageDefaut = nodeList2.item(0).getTextContent();
-        System.out.println("Page par défaut : " + pageDefaut);
+        String sourceDefaut = nodeList2.item(0).getTextContent();
+        System.out.println("Source html par défaut : " + sourceDefaut);
 
         NodeList nodeList3 = root.getElementsByTagName("accept");
         for(int i = 0; i < nodeList3.getLength(); i++){
@@ -56,6 +56,19 @@ public class HttpServer {
             listNotAccept.add(nodeList4.item(i).getTextContent());
             //System.out.println("ip not accept"+nodeList4.item(i).getTextContent());
         }
+
+        NodeList nodeList5 = root.getElementsByTagName("acceslog");
+        String acceslog = nodeList5.item(0).getTextContent();
+        System.out.println("acceslog : " + acceslog);
+
+        NodeList nodeList6 = root.getElementsByTagName("errorlog");
+        String errorlog = nodeList6.item(0).getTextContent();
+        System.out.println("errorlog : " + errorlog);
+
+        //fin initialisation du serveur
+        String lastIp = "";
+
+
 
 
 
@@ -73,6 +86,19 @@ public class HttpServer {
             while (true) {
 
                 Socket clientSocket = serverSocket.accept();
+                String ip = clientSocket.getInetAddress().toString();
+
+
+                if (!lastIp.equals(ip)){
+                    lastIp = ip;
+                    File fileAccesLog = new File(acceslog);
+                    FileWriter fw = new FileWriter(fileAccesLog, true);
+                    BufferedWriter bw = new BufferedWriter(fw);
+                    PrintWriter pw = new PrintWriter(bw);
+                    pw.println("clientConnecté ip: " + ip + "DD/MM/YYYY: " + java.time.LocalDate.now() + " HH:MM:SS: " + java.time.LocalTime.now());
+                    pw.close();
+                }
+
                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
 
@@ -95,7 +121,7 @@ public class HttpServer {
                 }
 
                 if(element.endsWith(".html")){
-                    File file = new File(element);
+                    File file = new File(sourceDefaut+element);
                     FileInputStream fis = new FileInputStream(file);
                     byte[] data = new byte[(int) file.length()];
                     fis.read(data);
@@ -118,6 +144,7 @@ public class HttpServer {
                         String l = "Content-Length: " + data.length;
                         out.write(l.getBytes());
                         out.write(data);
+                        System.out.println("image envoyé");
                         out.flush();
                     }
                     catch (FileNotFoundException e) {
@@ -126,6 +153,13 @@ public class HttpServer {
                         String l = "Content-Length: " + 0;
                         out.write(l.getBytes());
                         out.flush();
+
+                        File fileError = new File(errorlog);
+                        FileWriter fw = new FileWriter(fileError, true);
+                        BufferedWriter bw = new BufferedWriter(fw);
+                        PrintWriter pw = new PrintWriter(bw);
+                        pw.println("->clientConnecté ip: " + ip + " erreur: 404" + element + "DD/MM/YYYY: " + java.time.LocalDate.now() + " HH:MM:SS: " + java.time.LocalTime.now());
+                        pw.close();
                     }
 
                 }
@@ -137,7 +171,13 @@ public class HttpServer {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            File fileError = new File(errorlog);
+            FileWriter fw = new FileWriter(fileError, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            PrintWriter pw = new PrintWriter(bw);
+            pw.println("->crach total");
+            pw.close();
+
         }
     }
 }
