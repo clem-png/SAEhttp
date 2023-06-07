@@ -13,6 +13,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Base64;
 
 
 public class HttpServer {
@@ -87,7 +88,21 @@ public class HttpServer {
 
                 Socket clientSocket = serverSocket.accept();
                 String ip = clientSocket.getInetAddress().toString();
+                ip = ip.substring(1);
 
+                if(listAccept.contains(ip)){
+                    System.out.println("client accepté");
+                }
+                else if(listNotAccept.contains(ip)){
+                    System.out.println("client refusé");
+                    clientSocket.close();
+                    continue;
+                }
+                else{
+                    System.out.println("client inconnu");
+                    clientSocket.close();
+                    continue;
+                }
 
                 if (!lastIp.equals(ip)){
                     lastIp = ip;
@@ -95,7 +110,7 @@ public class HttpServer {
                     FileWriter fw = new FileWriter(fileAccesLog, true);
                     BufferedWriter bw = new BufferedWriter(fw);
                     PrintWriter pw = new PrintWriter(bw);
-                    pw.println("clientConnecté ip: " + ip + "DD/MM/YYYY: " + java.time.LocalDate.now() + " HH:MM:SS: " + java.time.LocalTime.now());
+                    pw.println("clientConnecté ip: " + ip + " DD/MM/YYYY: " + java.time.LocalDate.now() + " HH:MM:SS: " + java.time.LocalTime.now());
                     pw.close();
                 }
 
@@ -136,13 +151,20 @@ public class HttpServer {
                     try {
                         File file = new File(element);
                         FileInputStream fis = new FileInputStream(file);
+
                         byte[] data = new byte[(int) file.length()];
+                        byte[] data2 = new byte[(int) file.length()];
+                        data2 = Base64.getEncoder().encode(data);
+
                         fis.read(data);
                         fis.close();
-                        out.write("HTTP/1.1 200 OK".getBytes());
-                        out.write("Content-Type: image/gif".getBytes());
-                        String l = "Content-Length: " + data.length;
-                        out.write(l.getBytes());
+                        out.write("HTTP/1.1 200 OK\r\n".getBytes());
+                        out.write("Content-Type: image/jpeg\r\n".getBytes());
+                        out.write("Content-Encoding: base64\r\n".getBytes());
+                        out.write(("Content-Length: " + data.length + "\r\n").getBytes());
+
+                        out.write("\r\n".getBytes());
+
                         out.write(data);
                         System.out.println("image envoyé");
                         out.flush();
