@@ -149,7 +149,7 @@ public class HttpServer {
                     out.flush();
                 }else if (element.endsWith(".jpg") || element.endsWith(".jpeg") || element.endsWith(".png") || element.endsWith(".gif")){
                     try {
-                        File file = new File(element);
+                        File file = new File(sourceDefaut+element);
                         FileInputStream fis = new FileInputStream(file);
 
                         byte[] data = new byte[(int) file.length()];
