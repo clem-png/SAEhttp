@@ -91,10 +91,18 @@ public class HttpServer {
                 ip = ip.substring(1);
 
                 if(listAccept.contains(ip)){
-                    System.out.println("client accepté");
+                    //System.out.println("client accepté");
                 }
                 else if(listNotAccept.contains(ip)){
                     System.out.println("client refusé");
+
+                    File fileErrorLog = new File(errorlog);
+                    FileWriter fw = new FileWriter(fileErrorLog, true);
+                    BufferedWriter bw = new BufferedWriter(fw);
+                    PrintWriter pw = new PrintWriter(bw);
+                    pw.println("clientRefusé ip: " + ip + " DD/MM/YYYY: " + java.time.LocalDate.now() + " HH:MM:SS: " + java.time.LocalTime.now());
+                    pw.close();
+
                     clientSocket.close();
                     continue;
                 }
@@ -156,17 +164,17 @@ public class HttpServer {
                         byte[] data2 = new byte[(int) file.length()];
                         data2 = Base64.getEncoder().encode(data);
 
-                        fis.read(data);
+                        fis.read(data2);
                         fis.close();
                         out.write("HTTP/1.1 200 OK\r\n".getBytes());
                         out.write("Content-Type: image/jpeg\r\n".getBytes());
                         out.write("Content-Encoding: base64\r\n".getBytes());
-                        out.write(("Content-Length: " + data.length + "\r\n").getBytes());
+                        out.write(("Content-Length: " + data2.length + "\r\n").getBytes());
 
                         out.write("\r\n".getBytes());
 
-                        out.write(data);
-                        System.out.println("image envoyé");
+                        out.write(data2);
+                        //System.out.println("image envoyé");
                         out.flush();
                     }
                     catch (FileNotFoundException e) {
