@@ -2,6 +2,8 @@
     <port>8080</port>
     <root>source/</root>
     <accept>192.168.0.0/24</accept>
+    <accept>172.14.0.0/16</accept>
+    <accept>182.0.0.0/8</accept>
     <accept>192.168.2.0/24</accept>
     <accept>0:0:0:0:0:0:0:1</accept>
     <reject>192.168.1.0/24</reject>

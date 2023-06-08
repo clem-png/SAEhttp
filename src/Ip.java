@@ -1,6 +1,7 @@
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 
 public class Ip {
@@ -25,14 +26,9 @@ public class Ip {
      * @return retourne true si l'ip de client se trouve dans la listAccept
      * et false si elle est dans la liste listNotAccpet
      */
-    public boolean IsAccept(String clientIp) {
+    public boolean IsNotAccept(String clientIp) {
         for (int i = 0; i < listNotAccept.size(); i++) {
             if (listNotAccept.get(i).contains(clientIp)) {
-                return false;
-            }
-        }
-        for (int i = 0; i < listAccept.size(); i++) {
-            if (listAccept.get(i).contains(clientIp)) {
                 return true;
             }
         }
@@ -47,36 +43,31 @@ public class Ip {
      */
     public boolean Masque(String clientIp) {
         //Cherche si l'ip est dans la bonne liste
-        if (IsAccept(clientIp)) {
+        if (!IsNotAccept(clientIp)) {
             for (int i = 0; i < listAccept.size(); i++) {
-                if (listAccept.get(i).contains(":")) {
+                if (clientIp.contains(":")) {
                     return true;
-                } else {
+                } else if (!listAccept.get(i).contains(":")) {
                     //Si l'ip est en IPv4 on split le masque par / et split les parties par les points et on regarde manuellement
                     String tab1[] = listAccept.get(i).split("/");
                     String tab2[] = tab1[0].split("\\.");
                     String tab3[] = clientIp.split("\\.");
-                    if (tab1.length == 2) {
-                        if (tab1[1].equals("8")) {
-                            if (tab2[0].equals(tab3[0])) {
-                                return true;
-                            }
-                        }
-                        if (tab1[1].equals("16")) {
-                            if (tab2[0].equals(tab3[0]) && tab2[1].equals(tab3[1])) {
-                                return true;
-                            }
-                        }
-                        if (tab1[1].equals("24")) {
-                            if (tab2[0].equals(tab3[0]) && tab2[1].equals(tab3[1]) && tab2[2].equals(tab3[2])) {
-                                return true;
-                            }
-                        }
-                    } else {
-                        if (tab2[0].equals(tab3[0]) && tab2[1].equals(tab3[1]) && tab2[2].equals(tab3[2]) && tab2[3].equals(tab3[3])) {
+                    if (tab1[1].equals("8")) {
+                        if (tab2[0].equals(tab3[0])) {
                             return true;
                         }
                     }
+                    if (tab1[1].equals("16")) {
+                        if (tab2[0].equals(tab3[0]) && tab2[1].equals(tab3[1])) {
+                            return true;
+                        }
+                    }
+                    if (tab1[1].equals("24")) {
+                        if (tab2[0].equals(tab3[0]) && tab2[1].equals(tab3[1]) && tab2[2].equals(tab3[2])) {
+                            return true;
+                        }
+                    }
+                } else {
                 }
             }
         }
